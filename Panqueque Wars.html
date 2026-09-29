@@ -1,0 +1,179 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>🥞 Panqueque Wars 🍓</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;user-select:none;-webkit-user-select:none}
+body{margin:0;font-family:Arial,sans-serif;color:#fff;min-height:100vh;background:radial-gradient(circle at top,#663d78,transparent 45%),linear-gradient(135deg,#160d27,#24113d,#10243d) #160d27;touch-action:manipulation}
+#inicio{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px}
+.menu{width:min(700px,95%);padding:35px 25px;border-radius:30px;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.menu h1{font-size:clamp(38px,9vw,74px);margin:0}
+.menu p{font-size:18px;line-height:1.5}
+.start{margin-top:14px;padding:16px 34px;border:0;border-radius:18px;background:#ffd166;color:#291631;font-size:24px;font-weight:bold;cursor:pointer}
+.start:hover{transform:scale(1.06)}
+#juego{display:none;width:min(1100px,96%);margin:auto;padding:10px}
+.titulo{text-align:center;font-size:clamp(22px,5vw,32px);margin:6px 0}
+.stats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.stat{background:rgba(255,255,255,.1);border-radius:15px;padding:8px 14px;min-width:130px}
+.barra{height:14px;background:#21182f;border-radius:20px;overflow:hidden;margin-top:4px}
+.relleno{height:100%;transition:width .15s}
+#vida{background:#ef476f}#aura{background:#ffd166}
+#aura.listo{background:#fff;box-shadow:0 0 12px #ffd166}
+#info{text-align:center;min-height:24px;margin:8px 0 0;font-weight:bold;color:#ffd166}
+.arena{height:360px;margin-top:8px;position:relative;overflow:hidden;border-radius:25px;border:3px solid rgba(255,255,255,.2);background:radial-gradient(circle at 50% 25%,#70436f,transparent 50%),linear-gradient(#39204e,#171229);box-shadow:inset 0 -70px 0 rgba(0,0,0,.2)}
+.deco{position:absolute;bottom:8px;width:100%;text-align:center;opacity:.3;font-size:28px}
+.pj{position:absolute;bottom:50px;transform:translateX(-50%);z-index:5;text-align:center;line-height:1}
+.pj span{display:inline-block;font-size:64px}
+.pj.inv{opacity:.45}
+.eh{width:80px;height:8px;background:#21182f;border-radius:6px;margin:0 auto 2px;overflow:hidden}
+.eh div{height:100%;background:#ef476f;width:100%}
+.cr{font-style:normal;font-size:30px;display:block;height:30px}
+.gp{animation:golpe .3s}
+@keyframes golpe{30%{transform:scale(1.25) rotate(8deg)}60%{transform:scale(.9) rotate(-6deg)}}
+.pr{position:absolute;bottom:88px;font-size:26px;transform:translateX(-50%);z-index:8}
+.es{position:absolute;bottom:60px;font-size:30px;transform:translateX(-50%);z-index:8}
+.gh{position:absolute;bottom:50px;font-size:64px;transform:translateX(-50%);z-index:4;animation:fade .3s forwards}
+@keyframes fade{to{opacity:0}}
+.pa{position:absolute;bottom:90px;font-size:22px;z-index:20;pointer-events:none;animation:boom .7s forwards}
+@keyframes boom{to{transform:translate(var(--x),var(--y)) rotate(300deg) scale(.2);opacity:0}}
+.ani{position:absolute;bottom:40px;width:90px;height:90px;margin-left:-45px;border:6px solid #ffd166;border-radius:50%;z-index:25;animation:ring .7s forwards}
+@keyframes ring{to{transform:scale(9);opacity:0}}
+.temblor{animation:tem .3s}
+@keyframes tem{25%{transform:translate(-8px,3px)}50%{transform:translate(8px,-3px)}75%{transform:translate(-5px,2px)}}
+#ban{position:absolute;top:30px;width:100%;text-align:center;font-size:clamp(22px,6vw,40px);font-weight:bold;color:#ffd166;z-index:30;pointer-events:none}
+.controles{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:12px 0}
+.controles button{padding:14px 18px;border-radius:14px;background:#ffffff18;border:2px solid #ffffff25;color:#fff;font-weight:bold;font-size:16px;cursor:pointer;touch-action:none}
+.controles button:active{background:#ffffff40}
+.controles .esp{background:#8d5cff}
+.ayuda{text-align:center;font-size:14px;opacity:.85}
+#modal{position:fixed;inset:0;z-index:100;background:rgba(10,5,20,.8);display:none;align-items:center;justify-content:center;padding:14px;overflow:auto}
+.pregunta{background:#2b1a40;border:2px solid #705891;border-radius:22px;padding:20px;width:min(640px,100%);text-align:center}
+.pregunta h2{margin:0 0 14px;font-size:clamp(18px,4.5vw,25px)}
+.respuestas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.respuestas button{padding:14px;border-radius:14px;border:2px solid #705891;background:#302044;color:#fff;cursor:pointer;font-size:16px;font-weight:bold}
+.respuestas button:hover{background:#50356d}
+.respuestas .ok{background:#2a9d5c;border-color:#7dffb0}
+.respuestas .no{opacity:.5}
+#msg{min-height:26px;margin-top:12px;font-weight:bold}
+@media(max-width:650px){.arena{height:300px}.pj span{font-size:52px}.respuestas{grid-template-columns:1fr}.stat{min-width:110px}}
+:focus-visible{outline:3px solid #ffd166;outline-offset:2px}
+</style></head><body>
+<section id="inicio"><div class="menu">
+<h1>🥞🍓</h1><h1>PANQUEQUE WARS</h1>
+<p><b>La batalla definitiva del desayuno</b></p>
+<p>Vence a 5 flanes de fresa, hasta el Flan de Fresa Supremo. Cada cierto tiempo aparece una pregunta sobre panqueques de avena y flan de fresa: acierta para ganar aura, más daño y vida.</p>
+<button class="start" onclick="iniciar()">▶️ JUGAR</button>
+<p class="ayuda">A / D o ← / → = Moverse<br>ESPACIO = Ataque (mantén pulsado)<br>SHIFT = Dash (esquiva)<br>R = Aura Blast</p>
+</div></section>
+<main id="juego">
+<h1 class="titulo">🥞 PANQUEQUE WARS 🍓</h1>
+<div class="stats">
+<div class="stat">❤️ VIDA <b id="vt">100</b><div class="barra"><div id="vida" class="relleno"></div></div></div>
+<div class="stat">🌟 AURA <b id="at">0</b><div class="barra"><div id="aura" class="relleno"></div></div></div>
+<div class="stat">🏆 PUNTOS <b id="pt">0</b></div>
+<div class="stat">🔥 NIVEL <b id="nt">1</b>/5</div>
+</div>
+<div id="info"></div>
+<div id="arena" class="arena">
+<div id="ban"></div>
+<div id="jug" class="pj"><span>🥞</span></div>
+<div id="flan" class="pj"></div>
+<div class="deco">🥞 🍓 🍮 🍓 🥞</div>
+</div>
+<div class="controles">
+<button data-k="a">⬅️</button><button data-k="d">➡️</button>
+<button data-k="shift">💨 DASH</button><button data-k=" ">🥞 ATAQUE</button><button data-k="r" class="esp">🌟 AURA BLAST</button>
+</div>
+<p class="ayuda">A/D o ←/→ mover, ESPACIO atacar, SHIFT dash, R Aura Blast</p>
+</main>
+<div id="modal"><div class="pregunta" id="pq"></div></div>
+<script>
+const $=id=>document.getElementById(id),ar=$('arena'),pj=$('jug'),en=$('flan'),modal=$('modal'),pq=$('pq'),K={};
+const QB=[
+['¿Cuál es el ingrediente principal de los panqueques de avena?',['Avena','Arroz','Papa','Cebolla']],
+['¿Qué fruta da sabor al flan de fresa?',['Fresa','Manzana','Uva','Pera']],
+['¿Qué textura suele tener un buen flan?',['Cremosa','Crujiente','Seca','Dura']],
+['¿Qué puedes poner encima de unos panqueques de avena?',['Fresas','Cebolla','Ajo','Pepino']],
+['¿Qué ingrediente endulza el flan?',['Azúcar','Sal','Pimienta','Vinagre']],
+['¿Qué fruta combina muy bien con los panqueques de avena?',['Plátano','Cebolla','Ajo','Pepino']],
+['¿Qué sabor combina bien con la fresa?',['Vainilla','Ajo','Mostaza','Vinagre']],
+['¿Cómo se suele servir el flan?',['Frío','Hirviendo','Frito','Asado']],
+['¿Qué especia da aroma a los panqueques?',['Canela','Ajo','Mostaza','Orégano']],
+['¿Qué color tiene un flan de fresa?',['Rosado','Verde','Azul','Negro']],
+['¿Qué tipo de alimento es la avena?',['Cereal','Carne','Pescado','Lácteo']],
+['¿Qué fruta decora un flan de fresa?',['Fresa','Papa','Ajo','Cebolla']],
+['¿Qué acompañamiento queda bien con panqueques?',['Miel y fruta','Mostaza','Mayonesa','Salsa picante']],
+['¿Cómo es un flan de fresa?',['Suave y cremoso','Duro y seco','Crujiente','Salado']],
+['¿Cómo se ve un panqueque de avena bien cocinado?',['Dorado','Azul','Transparente','Negro']],
+['¿Qué se usa para cocinar un panqueque?',['Sartén','Regadera','Martillo','Cepillo']],
+['¿Qué bebida lleva la mezcla del panqueque?',['Leche','Refresco','Vinagre','Salsa de tomate']],
+['¿Qué hace el flan en el plato cuando lo mueves?',['Tiembla','Vuela','Ladra','Explota']]];
+// nombre, vida, velocidad, tamaño, cadencia de disparo (0 = no dispara), esJefe
+const LV=[['Flan básico',10,40,60,0,0],['Flan de fresa',16,70,66,3.2,0],['Flan gigante',28,45,100,2.6,0],['Flan jefe',30,80,84,2.2,1],['Flan de Fresa Supremo',60,70,116,1.8,1]];
+let S,P,E,shots=[],es=[],deck=[],mode='menu',last=0,T=0,shk=0;
+const sg=Math.sign,shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+addEventListener('keydown',e=>{const k=e.key.toLowerCase();if([' ','arrowleft','arrowright'].includes(k))e.preventDefault();if(!K[k]){K[k]=1;if(k==='shift')dash();if(k==='r')aura()}});
+addEventListener('keyup',e=>K[e.key.toLowerCase()]=0);
+document.querySelectorAll('.controles button').forEach(b=>{const k=b.dataset.k;
+b.addEventListener('pointerdown',e=>{e.preventDefault();K[k]=1;if(k==='shift')dash();if(k==='r')aura()});
+['pointerup','pointerleave','pointercancel'].forEach(n=>b.addEventListener(n,()=>K[k]=0))});
+function iniciar(){$('inicio').style.display='none';$('juego').style.display='block';nueva()}
+function nueva(){document.querySelectorAll('.pr,.es,.pa,.gh,.ani').forEach(x=>x.remove());shots=[];es=[];
+ S={lv:0,score:0,combo:0,cT:0,buff:0,qT:9,ban:0,bl:0};P={x:80,hp:100,aura:0,cd:0,dsh:0,dcd:0,inv:0,dd:1};
+ modal.style.display='none';spawn();mode='play'}
+function spawn(){const l=LV[S.lv];E={n:l[0],hp:l[1],max:l[1],sp:l[2],sz:l[3],sh:l[4],boss:l[5],r:l[3]*.5,x:ar.clientWidth-80,hit:0,cd:1.5,st:l[4],i:S.lv};
+ en.innerHTML='<em class="cr">'+(E.boss?'👑':'')+'</em><div class="eh"><div></div></div><span style="display:inline-block;font-size:'+E.sz+'px;filter:saturate('+(1+S.lv*.35)+')">🍮</span>';
+ es.forEach(s=>s.el.remove());es=[];S.ban=2;$('ban').textContent='Nivel '+(S.lv+1)+': '+E.n}
+function fx(x,icons,n,y){for(let i=0;i<n;i++){const p=document.createElement('div');p.className='pa';p.textContent=icons[i%icons.length];p.style.left=x+'px';if(y)p.style.bottom=y+'px';
+ p.style.setProperty('--x',(Math.random()-.5)*200+'px');p.style.setProperty('--y',(Math.random()-.5)*160+'px');ar.appendChild(p);setTimeout(()=>p.remove(),700)}}
+function shake(){ar.classList.remove('temblor');void ar.offsetWidth;ar.classList.add('temblor')}
+function anim(el){const s=el.querySelector('span');s.classList.remove('gp');void s.offsetWidth;s.classList.add('gp')}
+function dash(){if(mode!='play'||P.dcd>0)return;const d=(K.d||K.arrowright?1:0)-(K.a||K.arrowleft?1:0);P.dd=d||-sg(E.x-P.x)||1;P.dsh=.18;P.dcd=.8;P.inv=Math.max(P.inv,.3)}
+function aura(){if(mode!='play')return;if(P.aura<100){$('info').textContent='Necesitas el aura al 100%';return}
+ P.aura=0;S.bl=.7;shake();es.forEach(s=>s.el.remove());es=[];const r=document.createElement('div');r.className='ani';r.style.left=P.x+'px';ar.appendChild(r);setTimeout(()=>r.remove(),700);
+ fx(P.x,['⚡','✨','💥'],18,60);hitE(15)}
+function fire(){const d=sg(E.x-P.x)||1,el=document.createElement('div');el.className='pr';el.textContent='🥞';ar.appendChild(el);shots.push({x:P.x+d*40,vx:d*560,el});P.cd=.28}
+function dmg(){return(1+Math.min(S.combo,10)*.1)*(S.buff>0?1.5:1)}
+function hitE(d){E.hp-=d;E.hit=.12;S.combo++;S.cT=1.3;S.score+=10;P.aura=Math.min(100,P.aura+4);fx(E.x,['💥','✨','⭐'],5,90);shake();anim(en);
+ if(E.hp>0)return;
+ S.score+=200*(S.lv+1);fx(E.x,['💥','🍓','✨','⭐'],24,90);
+ if(S.lv==4){fin('🏆 ¡Ganaste!','Derrotaste al Flan de Fresa Supremo.','Jugar otra vez')}else{S.lv++;spawn()}}
+function hurt(n){if(P.inv>0)return;P.hp=Math.max(0,P.hp-n);P.inv=1;shake();fx(P.x,['🍓','💢'],6,80);anim(pj);
+ if(P.hp<=0&&mode!='end')fin('💥 ¡El flan te aplastó!','Llegaste al nivel '+(S.lv+1)+' de 5.','Reintentar')}
+function fin(t,s,b){mode='end';modal.style.display='flex';pq.innerHTML='<h2>'+t+'</h2><p>'+s+'</p><p><b>🏆 Puntos: '+S.score+'</b></p><button class="start" id="rj">'+b+'</button>';$('rj').onclick=nueva}
+function ask(){if(!deck.length)deck=shuf(QB.map((_,i)=>i));const q=QB[deck.pop()],o=shuf(q[1].map((t,i)=>[t,i==0]));mode='q';
+ K[' ']=K.a=K.d=K.arrowleft=K.arrowright=0;
+ pq.innerHTML='<h2>'+q[0]+'</h2><div class="respuestas">'+o.map((x,i)=>'<button data-ok="'+x[1]+'">'+'ABCD'[i]+') '+x[0]+'</button>').join('')+'</div><div id="msg">&nbsp;</div>';modal.style.display='flex';
+ const bs=[...pq.querySelectorAll('button')];
+ bs.forEach(b=>b.onclick=()=>{const ok=b.dataset.ok=='true';bs.forEach(x=>{x.disabled=true;x.classList.add(x.dataset.ok=='true'?'ok':'no')});
+  if(ok){S.score+=100;P.aura=Math.min(100,P.aura+30);S.buff=6;S.combo+=3;S.cT=2;P.hp=Math.min(100,P.hp+12);$('msg').textContent='✅ ¡Correcto! +100 puntos, aura, vida y más daño'}
+  else{P.aura=Math.max(0,P.aura-20);$('msg').textContent='❌ ¡Ups! El flan aprovecha para atacar'}
+  setTimeout(()=>{if(mode!='q')return;modal.style.display='none';mode='play';if(!ok){P.inv=0;hurt(12)}},1100)})}
+function upd(dt){
+ const W=ar.clientWidth;P.cd-=dt;P.dcd-=dt;P.inv-=dt;S.cT-=dt;S.buff-=dt;S.ban-=dt;S.bl-=dt;S.qT-=dt;E.hit-=dt;E.cd-=dt;
+ if(S.cT<=0)S.combo=0;
+ const d=(K.d||K.arrowright?1:0)-(K.a||K.arrowleft?1:0);
+ if(P.dsh>0){P.dsh-=dt;P.x+=P.dd*720*dt;const g=document.createElement('div');g.className='gh';g.textContent='🥞';g.style.left=P.x+'px';ar.appendChild(g);setTimeout(()=>g.remove(),300)}else P.x+=d*280*dt;
+ P.x=Math.max(40,Math.min(W-40,P.x));
+ if(K[' ']&&P.cd<=0)fire();
+ if(S.qT<=0&&S.ban<=0){S.qT=13;ask();return}
+ for(const s of shots){s.x+=s.vx*dt;if(mode=='play'&&Math.abs(s.x-E.x)<E.r+10){s.d=1;hitE(dmg())}s.el.style.left=s.x+'px'}
+ shots=shots.filter(s=>{if(s.d||s.x<0||s.x>W){s.el.remove();return false}return true});
+ if(mode!='play')return;
+ const ph=E.boss?(E.hp/E.max<.33?2:E.hp/E.max<.66?1:0):0,dx=P.x-E.x;
+ if(Math.abs(dx)>E.r+30)E.x+=sg(dx)*E.sp*(1+ph*.35)*dt;
+ else if(E.cd<=0){E.cd=1.2;if(P.inv<=0){hurt(10);P.x+=sg(dx)*50}}
+ if(E.sh>0&&S.ban<=0){E.st-=dt;if(E.st<=0){E.st=E.sh;for(let k=0;k<(ph==2?3:1);k++){const el=document.createElement('div');el.className='es';el.textContent='🍓';el.style.bottom=60+k*30+'px';ar.appendChild(el);es.push({x:E.x,vx:sg(dx)*(230+ph*40),el})}}}
+ for(const s of es){s.x+=s.vx*dt;if(Math.abs(s.x-P.x)<32){s.d=1;hurt(10)}s.el.style.left=s.x+'px'}
+ es=es.filter(s=>{if(s.d||s.x<-30||s.x>W+30){s.el.remove();return false}return true});
+}
+function hud(){if(!S)return;pj.style.left=P.x+'px';pj.classList.toggle('inv',P.inv>0&&Math.floor(T*20)%2==0);
+ if(E){en.style.left=E.x+'px';en.querySelector('.eh div').style.width=Math.max(0,E.hp/E.max*100)+'%'}
+ $('vida').style.width=P.hp+'%';$('aura').style.width=P.aura+'%';$('aura').classList.toggle('listo',P.aura>=100);
+ $('vt').textContent=Math.round(P.hp);$('at').textContent=Math.round(P.aura);$('pt').textContent=S.score;$('nt').textContent=S.lv+1;
+ $('ban').style.display=S.ban>0?'block':'none';
+ if(mode=='play'){let t=E.n;if(S.combo>1)t+='  Combo x'+S.combo;if(S.buff>0)t+='  Más daño '+Math.ceil(S.buff)+'s';if(P.aura>=100)t+='  ¡Aura lista! (R)';$('info').textContent=t}}
+function loop(t){const dt=Math.min((t-last)/1000,.05);last=t;T+=dt;if(mode=='play')upd(dt);hud();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+</script></body></html>
